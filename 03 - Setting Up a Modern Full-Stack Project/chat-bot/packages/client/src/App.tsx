@@ -1,26 +1,26 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import "./App.css";
-import axios from "axios";
+import './App.css';
+import axios from 'axios';
 
 function App() {
-  const [value, setValue] = useState("Hey Siri, call dad");
+    const [value, setValue] = useState('Hey Siri, call dad');
 
-  async function getAll() {
-    const promise = axios.get("/api/hello");
-    const result = (await promise).data;
-    console.log("res", result);
-    setTimeout(() => {
-      setValue(() => "ok, lets play the Beatles");
-    }, 1500);
-  }
+    async function getAll() {
+        const promise = axios.get('/api/hello');
+        const response = (await promise).data;
+        console.log('res', response);
+        setTimeout(() => {
+            setValue(() => response['message']);
+        }, 1500);
+    }
 
-  useEffect(() => {
-    getAll();
-  }, []);
+    useEffect(() => {
+        getAll();
+    }, []);
 
-  return <div>{value}</div>;
+    return <p className="font-bold p-4 text-3xl">{value}</p>;
 }
 
 export default App;
