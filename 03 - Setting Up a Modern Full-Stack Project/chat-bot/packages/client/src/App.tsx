@@ -1,18 +1,18 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from 'react';
 
 import './App.css';
 import axios from 'axios';
+import { Button } from './components/ui/button';
 
 function App() {
-    const [value, setValue] = useState('Hey Siri, call dad');
+    const [message, setMessage] = useState('Hey Siri, call dad');
 
     async function getAll() {
         const promise = axios.get('/api/hello');
         const response = (await promise).data;
         console.log('res', response);
         setTimeout(() => {
-            setValue(() => response['message']);
+            setMessage(() => response['message']);
         }, 1500);
     }
 
@@ -20,7 +20,12 @@ function App() {
         getAll();
     }, []);
 
-    return <p className="font-bold p-4 text-3xl">{value}</p>;
+    return (
+        <div className="p-4">
+            <p className="font-bold text-3xl">{message}</p>
+            <Button>Click me</Button>
+        </div>
+    );
 }
 
 export default App;
