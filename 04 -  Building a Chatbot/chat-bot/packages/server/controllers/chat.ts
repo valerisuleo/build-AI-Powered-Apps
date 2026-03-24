@@ -10,6 +10,6 @@ async function createRoute(req: Request, res: Response, next: NextFunction) {
     }
 }
 
-export const ChatCtrls = {
+export const chatCtrl = {
     create: createRoute,
 };

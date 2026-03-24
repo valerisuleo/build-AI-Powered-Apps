@@ -1,8 +1,8 @@
 import express from 'express';
-import { ChatCtrls } from '../controllers/chat';
+import { chatCtrl } from '../controllers/chat';
 
 const router = express.Router();
 
-router.route('/api/chat').post(ChatCtrls.create);
+router.route('/api/chat').post(chatCtrl.create);
 
 export default router;
