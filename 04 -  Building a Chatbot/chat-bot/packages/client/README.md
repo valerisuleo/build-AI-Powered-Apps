@@ -1297,3 +1297,189 @@ It all depends on what this chatbot is being used for.
 There is no hard and fast rule here.
 
 But what we can do later, and we will do that, is improve our prompt so we can guide the model to produce complete responses more reliably, regardless of the exact `max_output_tokens` value we choose.
+
+
+
+
+## Adding a typing indicator
+
+Right now we have to wait a second or two until we get a response, and during that time there is no visual feedback.
+
+
+So back to our component, here we declare a state variable with `useState`.
+
+We initialize it to `false` and call it `isBotTyping`.
+
+```tsx
+const [isBotTyping, setIsBotTyping] = useState(false);
+```
+
+Now, in our submit handler, right after we update the messages, we set `isBotTyping` to `true`.
+
+And at the end, once we get a response, we set it back to `false`.
+
+So the submit handler becomes something like this:
+
+```tsx
+const onSubmit = async ({ prompt }: FormData) => {
+  setMessages(prev => [
+    ...prev,
+    { content: prompt, role: 'user' },
+  ]);
+
+  setIsBotTyping(true);
+  reset();
+
+  const { data } = await axios.post<ChatResponse>('/api/chat', {
+    prompt,
+    conversationId: conversationId.current,
+  });
+
+  setMessages(prev => [
+    ...prev,
+    { content: data.message, role: 'bot' },
+  ]);
+
+  setIsBotTyping(false);
+};
+```
+
+### Rendering a basic typing indicator
+
+Now, in our markup, right after we render our messages, we add the typing indicator.
+
+So we check if `isBotTyping`, and for now let’s just render a dot.
+
+```tsx
+{isBotTyping && <div>.</div>}
+```
+
+That works, but obviously we want something better.
+
+### Building the animated dots
+
+So instead of a plain dot, we add a `div` and style it like a small circle.
+
+For the first dot, we apply a few classes:
+
+* `w-2` and `h-2` to make it a square
+* `rounded-full` to make it a circle
+* `bg-gray-800` for the color
+* `animate-pulse` for the animation
+
+So the first dot looks like this:
+
+```tsx
+<div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse" />
+```
+
+Now let’s take a look.
+
+If we ask a question again, we get one animating dot.
+
+That already looks good.
+
+#### Adding three dots
+
+Now we want three of these laid out horizontally.
+
+So first, we add a container `div`, then we duplicate the dot a couple of times.
+
+We make the parent a flex container and add a small gap between the dots.
+
+We also give the container some padding, a light background, and rounded corners.
+
+So now the typing indicator becomes:
+
+```tsx
+{isBotTyping && (
+  <div className="flex gap-1 px-3 py-3 bg-gray-200 rounded-xl">
+    <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse" />
+    <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse" />
+    <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse" />
+  </div>
+)}
+```
+
+That looks better.
+
+#### Preventing it from stretching
+
+But I don’t want the typing indicator to stretch and take up all the available space.
+
+The reason that is happening is because we are rendering it inside a vertical flex container.
+
+In a flex container, items stretch by default to take up the available space.
+
+That’s why earlier we applied `self-end` and `self-start` on our messages to make them smaller and position them left or right.
+
+So here, we apply:
+
+```tsx
+self-start
+```
+
+That pushes the typing indicator to the left and prevents it from stretching.
+
+So now it becomes:
+
+```tsx
+{isBotTyping && (
+  <div className="self-start flex gap-1 px-3 py-3 bg-gray-200 rounded-xl">
+    <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse" />
+    <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse" />
+    <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse" />
+  </div>
+)}
+```
+
+Now it looks much more like a real chat bubble.
+
+#### Adding staggered animation
+
+Now, if you pay close attention, all three dots are animating at the same time.
+
+That works, but to make it more interesting, we want to add a slight delay to the second and third dots so they have a staggered effect.
+
+So for the second dot, we add an arbitrary Tailwind value for animation delay:
+
+```tsx
+[animation-delay:0.2s]
+```
+
+And for the third dot:
+
+```tsx
+[animation-delay:0.4s]
+```
+
+>We are putting these inside square brackets because there is no built-in Tailwind class for these exact delays. This is an arbitrary value.
+
+So now the typing indicator becomes:
+
+
+```tsx
+<div className="mb-10 flex flex-col gap-3">
+  {messages.map((message, index) => (
+    <p
+      key={index}
+      className={`px-3 py-1 rounded-xl ${
+        message.role === 'user'
+          ? 'bg-blue-600 text-white self-end'
+          : 'bg-gray-100 text-black'
+      }`}
+    >
+      <ReactMarkdown>{message.content}</ReactMarkdown>
+    </p>
+  ))}
+
+  {isBotTyping && (
+    <div className="self-start flex gap-1 px-3 py-3 bg-gray-200 rounded-xl">
+      <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse" />
+      <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse [animation-delay:0.2s]" />
+      <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse [animation-delay:0.4s]" />
+    </div>
+  )}
+</div>
+```
+

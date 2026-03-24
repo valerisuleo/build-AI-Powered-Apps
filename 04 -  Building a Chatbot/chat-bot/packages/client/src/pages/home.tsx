@@ -19,6 +19,7 @@ const Home = () => {
     const { register, handleSubmit, reset, formState } = useForm<FormData>();
     const conversationId = useMemo(() => crypto.randomUUID(), []);
     const [messages, setMessages] = useState<Message[]>([]);
+    const [isBotTyping, setIsBotTyping] = useState(false);
 
     const onSubmit = async (data: FormData) => {
         console.log(data);
@@ -26,6 +27,7 @@ const Home = () => {
             ...prev,
             { content: data.prompt, role: 'user' },
         ]);
+        setIsBotTyping(true);
         const promise = axios.post('/api/chat', {
             prompt: data.prompt,
             conversationId: conversationId,
@@ -36,6 +38,7 @@ const Home = () => {
             ...prev,
             { content: response['output_text'], role: 'bot' },
         ]);
+        setIsBotTyping(false);
 
         reset();
     };
@@ -62,6 +65,13 @@ const Home = () => {
                         <ReactMarkdown>{message.content}</ReactMarkdown>
                     </div>
                 ))}
+                {isBotTyping && (
+                    <div className="self-start flex gap-1 px-3 py-3 bg-gray-200 rounded-xl">
+                        <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse" />
+                        <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse [animation-delay:0.2s]" />
+                        <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse [animation-delay:0.4s]" />
+                    </div>
+                )}
             </div>
 
             <form
