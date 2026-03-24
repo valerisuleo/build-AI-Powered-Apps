@@ -2,7 +2,14 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { FaArrowUp } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
-import { Fragment, useMemo, useState, type KeyboardEvent } from 'react';
+import {
+    Fragment,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+    type KeyboardEvent,
+} from 'react';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 
@@ -20,6 +27,13 @@ const Home = () => {
     const conversationId = useMemo(() => crypto.randomUUID(), []);
     const [messages, setMessages] = useState<Message[]>([]);
     const [isBotTyping, setIsBotTyping] = useState(false);
+    const formRef = useRef<HTMLFormElement | null>(null);
+
+    useEffect(() => {
+        formRef.current?.scrollIntoView({
+            behavior: 'smooth',
+        });
+    }, [messages]);
 
     const onSubmit = async (data: FormData) => {
         console.log(data);
@@ -75,6 +89,7 @@ const Home = () => {
             </div>
 
             <form
+                ref={formRef}
                 className="flex flex-col gap-2 items-end border-2 p-4 rounded-3xl my-5"
                 onSubmit={handleSubmit(onSubmit)}
             >

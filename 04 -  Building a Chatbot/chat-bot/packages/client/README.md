@@ -1483,3 +1483,55 @@ So now the typing indicator becomes:
 </div>
 ```
 
+
+## Auto-scrolling to the latest message
+
+A good chat interface should automatically scroll to the latest message, but that’s an easy fix.
+
+
+>We’re going to get a reference to our form, and whenever the `messages` array changes, we’re going to scroll down to that reference.
+
+### Creating a ref for the form
+
+So here we use the `useRef` hook to get a reference to our form.
+
+
+```tsx
+const formRef = useRef<HTMLFormElement | null>(null);
+```
+
+Now down in our markup, where we declare the form, we set the `ref` prop to `formRef`.
+
+```tsx
+<form
+  ref={formRef}
+  onSubmit={handleSubmit(onSubmit)}
+  className="flex flex-col gap-2 items-end border-2 p-4 rounded-3xl"
+>
+```
+
+So this reference is now pointing to our form.
+
+### Scrolling when messages change
+
+Now we’re going to use the `useEffect` hook.
+
+
+So inside the effect, we check if `formRef.current` exists.
+
+If it does, we call `scrollIntoView()`.
+
+To make the animation smooth, we pass an options object and set `behavior` to `smooth`.
+
+```tsx
+useEffect(() => {
+  formRef.current?.scrollIntoView({
+    behavior: 'smooth',
+  });
+}, [messages]);
+```
+
+That’s it.
+
+This effect runs every time the `messages` array changes.
+
