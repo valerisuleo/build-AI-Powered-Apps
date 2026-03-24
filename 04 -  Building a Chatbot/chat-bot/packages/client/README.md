@@ -896,3 +896,152 @@ const { data } = await axios.post('/api/chat', {
 console.log(data);
 ```
 
+
+## Rendering messages
+
+Now, to render messages, we’re going to declare a state variable using the `useState` hook.
+
+This should be a string array.
+
+We initialize it to an empty array and call it `messages`.
+
+```tsx
+const [messages, setMessages] = useState<string[]>([]);
+```
+
+### Adding the prompt and the response
+
+Now, when submitting the form, the first thing we’re going to do is add the new prompt to our messages.
+
+So we call `setMessages()`, copy all the existing messages, and then add the new prompt.
+
+```tsx
+setMessages([...messages, prompt]);
+```
+
+And similarly, once we get a response from the server, instead of logging it to the console, we call `setMessages()` again, copy all the existing values, and then add `data.message`.
+
+```tsx
+setMessages([...messages, data.message]);
+```
+
+`data` is an object that we get from the server. It is not a string. It is an object with a `message` property.
+
+### Typing the server response
+
+Now, if you pay close attention, when we type `data.`, we don’t get IntelliSense.
+
+That is because TypeScript doesn’t know the type of object we get from the server.
+
+To fix this, we define a new type.
+
+```tsx
+type ChatResponse = {
+  message: string;
+};
+```
+
+Now, when calling `axios.post()`, we pass `ChatResponse` as a generic type argument.
+
+```tsx
+const { data } = await axios.post<ChatResponse>('/api/chat', {
+  prompt,
+  conversationId: conversationId.current,
+});
+```
+
+With this, if we type `data.`, we get IntelliSense, and TypeScript knows that `data.message` exists.
+
+### Wrapping the form and rendering the messages
+
+Now, to render the messages, we come to our markup.
+
+We’re going to wrap the form inside a `div`, because this will become our container.
+
+Inside this container, we add another `div` for rendering our messages.
+
+Then in braces, we use `messages.map()` and map each message to a paragraph.
+
+Because we’re using `map()`, each paragraph should also have a `key`.
+
+So we add a second parameter, which is the `index`, and use that as the key.
+
+So at this point, the component looks like this:
+
+```tsx
+import { type KeyboardEvent, useRef, useState } from 'react';
+import axios from 'axios';
+import { FaArrowUp } from 'react-icons/fa';
+import { useForm } from 'react-hook-form';
+
+type FormData = {
+  prompt: string;
+};
+
+type ChatResponse = {
+  message: string;
+};
+
+const Chatbot = () => {
+  const conversationId = useRef(crypto.randomUUID());
+  const [messages, setMessages] = useState<string[]>([]);
+
+  const { register, handleSubmit, reset, formState } = useForm<FormData>({
+    mode: 'onChange',
+  });
+
+  const onSubmit = async ({ prompt }: FormData) => {
+    setMessages(prev => [...prev, prompt]);
+    reset();
+
+    const { data } = await axios.post<ChatResponse>('/api/chat', {
+      prompt,
+      conversationId: conversationId.current,
+    });
+
+    setMessages(prev => [...prev, data.message]);
+  };
+
+  const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(onSubmit)();
+    }
+  };
+
+  return (
+    <div>
+      <div>
+        {messages.map((message, index) => (
+          <p key={index}>{message}</p>
+        ))}
+      </div>
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col gap-2 items-end border-2 p-4 rounded-3xl"
+      >
+        <textarea
+          {...register('prompt', {
+            required: true,
+            validate: data => data.trim().length > 0,
+          })}
+          onKeyDown={onKeyDown}
+          className="w-full border-0 focus:outline-0 resize-none"
+          placeholder="Ask anything"
+          maxLength={1000}
+        />
+        <button
+          disabled={!formState.isValid}
+          className="rounded-full w-9 h-9"
+        >
+          <FaArrowUp />
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default Chatbot;
+```
+
