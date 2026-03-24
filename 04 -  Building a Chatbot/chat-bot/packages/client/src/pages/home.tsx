@@ -2,7 +2,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { FaArrowUp } from 'react-icons/fa';
 import { useForm } from 'react-hook-form';
-import { type KeyboardEvent } from 'react';
+import { useMemo, type KeyboardEvent } from 'react';
+import axios from 'axios';
 
 type FormData = {
     prompt: string;
@@ -10,9 +11,17 @@ type FormData = {
 
 const Home = () => {
     const { register, handleSubmit, reset, formState } = useForm<FormData>();
+    const conversationId = useMemo(() => crypto.randomUUID(), []);
 
-    const onSubmit = (data: FormData) => {
+    const onSubmit = async (data: FormData) => {
         console.log(data);
+        const promise = axios.post('/api/chat', {
+            prompt: data.prompt,
+            conversationId: conversationId,
+        });
+        const response = (await promise).data;
+        console.log('response', response);
+
         reset();
     };
 

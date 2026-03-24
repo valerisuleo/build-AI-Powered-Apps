@@ -736,3 +736,163 @@ export default Chatbot;
 ```
 
 
+
+
+
+## Posting the data to the server
+
+Now, to post the data to the server, we have to make an HTTP call.
+
+For that, we can either use the `fetch` function or **Axios**.
+
+I prefer Axios because it handles things like:
+
+* JSON parsing
+* request cancellation
+* error handling
+
+out of the box.
+
+It also has a cleaner and more readable syntax.
+
+### Installing Axios
+
+So let’s go back to the terminal, here in the `client` directory, and add Axios.
+
+```bash
+bun add axios
+```
+
+Great.
+
+### Importing Axios
+
+
+So instead of:
+
+```tsx
+
+import axios from 'axios';
+
+const onSubmit = (data: FormData) => {
+  console.log(data);
+  reset();
+};
+```
+
+we move toward this structure:
+
+```tsx
+const onSubmit = async (data: FormData) => {
+  reset();
+
+  const response = await axios.post('/api/chat', {
+    prompt: data.prompt,
+  });
+
+  console.log(response.data);
+};
+```
+
+### Destructuring the prompt
+
+Now we can simplify this a bit.
+
+`data` only has one property, and that is `prompt`.
+
+So we can destructure it directly in the function parameter.
+
+That means this:
+
+```tsx
+const onSubmit = async (data: FormData) => {
+```
+
+becomes:
+
+```tsx
+const onSubmit = async ({ prompt }: FormData) => {
+```
+
+and then we don’t need to write `data.prompt` anymore.
+
+So now we can write:
+
+```tsx
+const onSubmit = async ({ prompt }: FormData) => {
+  reset();
+
+  const response = await axios.post('/api/chat', {
+    prompt,
+  });
+
+  console.log(response.data);
+};
+```
+
+### Adding the conversation ID
+
+We should also send `conversationId`.
+
+Now where do we get this from?
+
+We should create it the first time the form is loaded, and for that we use the `useRef` hook.
+
+Inside this component, we call `useRef` and initialize it with `crypto.randomUUID()`.
+
+`crypto` is available in all modern browsers, and it gives us a method for creating a new UUID.
+
+So we do this:
+
+```tsx
+const conversationId = useRef(crypto.randomUUID());
+```
+
+Now, why am I using `useRef` here?
+
+We could also use `useState`, but the `conversationId` should be created once and should not change.
+
+It is not supposed to trigger a re-render.
+
+That is the difference between `useRef` and `useState`.
+
+With `useRef`, we can store values that should persist across renders without causing re-renders.
+
+It’s good for things like:
+
+* timers
+* DOM references
+* IDs like this one
+
+So now that we have the conversation ID, we pass it to the server with:
+
+```tsx
+conversationId: conversationId.current
+```
+
+### Awaiting the response
+
+Next, we await the call, get the response, destructure it to grab the `data` property, and finally log it on the console to make sure everything is working.
+
+So this:
+
+```tsx
+const response = await axios.post('/api/chat', {
+  prompt,
+  conversationId: conversationId.current,
+});
+
+console.log(response.data);
+```
+
+can be simplified to:
+
+```tsx
+const { data } = await axios.post('/api/chat', {
+  prompt,
+  conversationId: conversationId.current,
+});
+
+console.log(data);
+```
+
