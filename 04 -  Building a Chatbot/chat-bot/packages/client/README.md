@@ -1045,3 +1045,255 @@ const Chatbot = () => {
 export default Chatbot;
 ```
 
+
+
+## Styling the messages like a conversation
+
+
+First, we define a type called `Message` and give it two properties:
+
+* `content`, which is a string
+* `role`, which can be `'user'` or `'bot'`
+
+With this, we can distinguish between user and bot messages.
+
+```tsx
+type Message = {
+  content: string;
+  role: 'user' | 'bot';
+};
+```
+
+Now, when declaring our state variable, we change the type to a `Message[]`.
+
+```tsx
+const [messages, setMessages] = useState<Message[]>([]);
+```
+
+### Storing structured messages
+
+Now, when updating this state, instead of pushing plain strings, we push objects.
+
+So when the user submits a prompt, we add:
+
+```tsx
+setMessages(prev => [
+  ...prev,
+  { content: prompt, role: 'user' },
+]);
+```
+
+And similarly, once we get a response from the server, we add:
+
+```tsx
+setMessages(prev => [
+  ...prev,
+  { content: data.message, role: 'bot' },
+]);
+```
+
+So now `onSubmit` becomes:
+
+```tsx
+const onSubmit = async ({ prompt }: FormData) => {
+  setMessages(prev => [
+    ...prev,
+    { content: prompt, role: 'user' },
+  ]);
+
+  reset();
+
+  const { data } = await axios.post<ChatResponse>('/api/chat', {
+    prompt,
+    conversationId: conversationId.current,
+  });
+
+  setMessages(prev => [
+    ...prev,
+    { content: data.message, role: 'bot' },
+  ]);
+};
+```
+
+
+
+### Styling each message bubble
+
+Now for styling these, we apply a bunch of classes.
+
+So the paragraph becomes:
+
+
+```tsx
+<div className="flex flex-col gap-3">
+  {messages.map((message, index) => (
+    <p
+      key={index}
+      className={`px-3 py-1 rounded-xl ${
+        message.role === 'user'
+          ? 'bg-blue-600 text-white'
+          : 'bg-gray-100 text-black'
+      }`}
+    >
+      {message.content}
+    </p>
+  ))}
+</div>
+```
+
+
+#### Pushing user messages to the right
+
+Now, I don’t want the messages to take the entire available width.
+
+I want:
+
+* user messages on the right
+* bot messages on the left
+
+So here we add another class dynamically.
+
+For user messages, we use:
+
+```tsx
+self-end
+```
+
+This is similar to classes like `items-end`, but there is an important difference.
+
+Here we have a vertical flex container, so:
+
+* the main axis is vertical
+* the cross axis is horizontal
+
+Earlier, classes like `items-end` positioned **all** elements in the container along the cross axis.
+
+But in this case, we want to position each message individually depending on its role.
+
+That is where classes that start with `self-` come in.
+
+So user messages should be moved to the end of the horizontal axis, while bot messages should stay at the start.
+
+So now the class name becomes:
+
+```tsx
+<p
+    key={index}
+    className={`px-3 py-1 rounded-xl ${
+        message.role === 'user'
+            ? 'bg-blue-600 text-white self-end'
+            : 'bg-gray-100 text-black self-start'
+    }`}
+>
+    {message.content}
+</p>
+```
+
+Now user messages go to the right, and bot messages stay on the left.
+
+
+## Rendering markdown in bot responses
+
+Right now, we are displaying bot messages as plain text, but some of them include markdown formatting, like bold text, code blocks, or lists.
+
+For example, if we ask, *what are three benefits of exercising?*, some parts of the response may come back wrapped in double asterisks. Those should be rendered as bold text, but right now they are being displayed as plain text.
+
+So in this lesson, we’ll render those responses properly so they look the way they’re meant to.
+
+For that, we’re going to use a markdown library.
+
+### Installing react-markdown
+
+Back in the terminal window, pointing to the `client` directory, we add `react-markdown`.
+
+```bash
+bun add react-markdown
+```
+
+
+Now, back to our component.
+
+On the top, we import `ReactMarkdown` from `react-markdown`.
+
+
+```tsx
+import ReactMarkdown from 'react-markdown';
+```
+
+Now, where do we render our messages? That’s down here in our markup.
+
+Right now, we are rendering the message content directly. Instead, we wrap it inside a `ReactMarkdown` component.
+
+So instead of rendering plain text like this:
+
+```tsx
+{message.content}
+```
+
+we render it like this:
+
+```tsx
+<ReactMarkdown>{message.content}</ReactMarkdown>
+```
+
+At this point, the message bubble becomes something like this:
+
+```tsx
+<p
+  key={index}
+  className={`px-3 py-1 rounded-xl ${
+    message.role === 'user'
+      ? 'bg-blue-600 text-white self-end'
+      : 'bg-gray-100 text-black'
+  }`}
+>
+  <ReactMarkdown>{message.content}</ReactMarkdown>
+</p>
+```
+
+Now let’s test this.
+
+If we go back to the browser and ask:
+
+```text
+What are three benefits of exercising?
+```
+
+we should now see the markdown rendered properly.
+
+
+
+### Fixing cut-off responses
+
+if we pay close attention, the response may still be cut off mid-sentence.
+
+That is because of the constraint we applied earlier on the output tokens.
+
+>So where should we modify that?
+
+That belongs in the **chat service**, because that is application logic. That is where we call OpenAI.
+
+So we go to `chat.service.ts`.
+
+Earlier, we used:
+
+```ts
+max_output_tokens: 100
+```
+
+Now we increase it to:
+
+```ts
+max_output_tokens: 200
+```
+
+
+>### Important note about max_output _tokens
+
+Now, I need to clarify that even `200` may not be enough for certain responses.
+
+It all depends on what this chatbot is being used for.
+
+There is no hard and fast rule here.
+
+But what we can do later, and we will do that, is improve our prompt so we can guide the model to produce complete responses more reliably, regardless of the exact `max_output_tokens` value we choose.
