@@ -1,7 +1,10 @@
 import z from 'zod';
 import { client } from '../config/openai';
+import type { IPayload } from './interfaces';
 
-export const chatSchema = z.object({
+const conversations = new Map<string, string>();
+
+const chatSchema = z.object({
     prompt: z
         .string()
         .trim()
@@ -10,12 +13,21 @@ export const chatSchema = z.object({
     conversationId: z.uuid('Invalid UUID'),
 });
 
-export const chat = client.responses;
-export interface ChatRequest {
-    prompt: string;
-    conversationId: string;
-}
+export const Chat = {
+    async create(body: IPayload) {
+        const validatedData = chatSchema.parse(body);
+        const { prompt, conversationId } = validatedData;
 
-export interface ChatResponse {
-    message: string;
-}
+        const result = await client.responses.create({
+            model: 'gpt-4o-mini',
+            input: prompt,
+            temperature: 0.2,
+            max_output_tokens: 100,
+            previous_response_id: conversations.get(conversationId),
+        });
+
+        conversations.set(conversationId, result.id);
+
+        return result;
+    },
+};
