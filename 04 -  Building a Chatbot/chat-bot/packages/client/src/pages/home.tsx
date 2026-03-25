@@ -1,6 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { FaArrowUp } from 'react-icons/fa';
+import { IoInformationCircle } from 'react-icons/io5';
 import { useForm } from 'react-hook-form';
 import {
     Fragment,
@@ -10,23 +12,18 @@ import {
     useState,
     type KeyboardEvent,
 } from 'react';
-import axios from 'axios';
+import axios from '@/lib/axios';
 import ReactMarkdown from 'react-markdown';
-
-type FormData = {
-    prompt: string;
-};
-
-type Message = {
-    content: string;
-    role: 'user' | 'bot';
-};
+import { TypingIndicator } from '@/components/custom/typing-indicator';
+import { MessageBubble } from '@/components/custom/message-bubble';
+import type { FormData, Message } from '@/types/interface';
 
 const Home = () => {
     const { register, handleSubmit, reset, formState } = useForm<FormData>();
     const conversationId = useMemo(() => crypto.randomUUID(), []);
     const [messages, setMessages] = useState<Message[]>([]);
     const [isBotTyping, setIsBotTyping] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const formRef = useRef<HTMLFormElement | null>(null);
 
     useEffect(() => {
@@ -35,26 +32,48 @@ const Home = () => {
         });
     }, [messages]);
 
+    const promptCreate = async (prompt: string, conversationId: string) => {
+        try {
+            const response = await axios.post('/api/chat', {
+                prompt,
+                conversationId,
+            });
+            return { success: true, data: response.data };
+        } catch (error) {
+            return {
+                success: false,
+                error:
+                    error instanceof Error
+                        ? error.message
+                        : 'An error occurred',
+            };
+        }
+    };
+
     const onSubmit = async (data: FormData) => {
-        console.log(data);
+        setError(null);
         setMessages((prev) => [
             ...prev,
             { content: data.prompt, role: 'user' },
         ]);
         setIsBotTyping(true);
-        const promise = axios.post('/api/chat', {
-            prompt: data.prompt,
-            conversationId: conversationId,
-        });
-        const response = (await promise).data;
-        console.log('response', response);
-        setMessages((prev) => [
-            ...prev,
-            { content: response['output_text'], role: 'bot' },
-        ]);
-        setIsBotTyping(false);
 
-        reset();
+        const response = await promptCreate(data.prompt, conversationId);
+
+        if (response.success) {
+            setMessages((prev) => [
+                ...prev,
+                { content: response.data['output_text'], role: 'bot' },
+            ]);
+            reset();
+        } else {
+            setError(response.error || 'An error occurred');
+            setTimeout(() => {
+                setError(null);
+            }, 3000);
+        }
+
+        setIsBotTyping(false);
     };
 
     const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -66,26 +85,21 @@ const Home = () => {
 
     return (
         <Fragment>
+            {error && (
+                <Alert variant="default" className="mb-4 max-w-md">
+                    <IoInformationCircle />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                </Alert>
+            )}
+
             <div className="flex flex-col gap-3">
                 {messages.map((message, index) => (
-                    <div
-                        key={index}
-                        className={`px-3 py-1 rounded-xl ${
-                            message.role === 'user'
-                                ? 'bg-blue-600 text-white self-end'
-                                : 'bg-gray-100 text-black self-start'
-                        }`}
-                    >
+                    <MessageBubble key={index} role={message.role}>
                         <ReactMarkdown>{message.content}</ReactMarkdown>
-                    </div>
+                    </MessageBubble>
                 ))}
-                {isBotTyping && (
-                    <div className="self-start flex gap-1 px-3 py-3 bg-gray-200 rounded-xl">
-                        <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse" />
-                        <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse [animation-delay:0.2s]" />
-                        <div className="w-2 h-2 rounded-full bg-gray-800 animate-pulse [animation-delay:0.4s]" />
-                    </div>
-                )}
+                {isBotTyping && <TypingIndicator />}
             </div>
 
             <form
