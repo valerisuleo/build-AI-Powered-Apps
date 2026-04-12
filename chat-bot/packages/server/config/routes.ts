@@ -1,5 +1,5 @@
 import express from 'express';
-import { chatCtrl } from '../controllers/chat';
+import { chatCtrl } from '../controllers/chats';
 import { productCtrl } from '../controllers/products';
 import { reviewCtrl } from '../controllers/reviews';
 import { summaryCtrl } from '../controllers/summaries';
