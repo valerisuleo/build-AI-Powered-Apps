@@ -8,8 +8,8 @@ const template = fs.readFileSync(
 );
 
 export const Summary = {
-    async create(reviewsText: string): Promise<string> {
-        const prompt = template.replace('{{reviews}}', reviewsText);
+    async create(joinedReviews: string): Promise<string> {
+        const prompt = template.replace('{{reviews}}', joinedReviews);
         const response = await client.responses.create({
             model: 'gpt-4.1',
             input: prompt,
