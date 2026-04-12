@@ -10,28 +10,6 @@ async function indexRoute(req: Request, res: Response, next: NextFunction) {
     }
 }
 
-async function showRoute(req: Request, res: Response, next: NextFunction) {
-    const productId = Number(req.params.id);
-    try {
-        const product = await prisma.product.findUnique({
-            where: { id: productId },
-        });
-        if (!product) return res.notFound();
-        const result = await prisma.review.findMany({
-            where: {
-                productId,
-            },
-            orderBy: {
-                createdAt: 'desc',
-            },
-        });
-        res.json(result);
-    } catch (error) {
-        next(error);
-    }
-}
-
 export const productCtrl = {
     index: indexRoute,
-    show: showRoute,
 };
