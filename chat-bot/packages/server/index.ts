@@ -12,6 +12,7 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(customResponses);
 app.use(routes);
+app.use((req, res, next) => res.notFound());
 app.use(errorHandler);
 
 app.listen(port, () => {

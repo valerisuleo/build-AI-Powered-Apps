@@ -10,9 +10,15 @@ declare global {
     }
 }
 
-export function customResponses(req: Request, res: Response, next: NextFunction) {
+export function customResponses(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) {
     res.notFound = function notFound() {
-        const err: any = new Error('Not Found');
+        const err: any = new Error(
+            'The page you are looking for cannot be found',
+        );
         err.status = 404;
         throw err;
     };
