@@ -7,9 +7,15 @@ import { summaryCtrl } from '../controllers/summaries';
 const router = express.Router();
 
 router.route('/api/chat').post(chatCtrl.create);
-
+// product
 router.route('/api/products').get(productCtrl.index);
+router.route('/api/products/:id').get(productCtrl.show);
+// review
 router.route('/api/products/:id/reviews').get(reviewCtrl.show);
-router.route('/api/products/:id/reviews/summarize').post(summaryCtrl.create);
+// summary
+router
+    .route('/api/products/:id/reviews/summarize')
+    .get(summaryCtrl.show)
+    .post(summaryCtrl.create);
 
 export default router;

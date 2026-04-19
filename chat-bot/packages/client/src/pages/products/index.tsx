@@ -1,8 +1,7 @@
-/* eslint-disable react-hooks/immutability */
-/* eslint-disable react-hooks/set-state-in-effect */
 import axios from '@/lib/axios';
-import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import 'react-loading-skeleton/dist/skeleton.css';
 import {
     Card,
     CardContent,
@@ -14,28 +13,19 @@ import type { IProduct } from './interfaces';
 import NotFound from '@/components/custom/not-found';
 
 const IndexPage = () => {
-    const [products, setProducts] = useState<IProduct[]>([]);
-    const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        getList();
-    }, []);
+    const { data: products = [], error } = useQuery<IProduct[]>({
+        queryKey: ['products'],
+        queryFn: getList,
+    });
 
-    async function getList(): Promise<void> {
-        try {
-            const promise = axios.get('/api/products');
-            const response = await promise;
-
-            setProducts(response.data);
-        } catch (error) {
-            setError(
-                error instanceof Error ? error.message : 'Something went wrong',
-            );
-        }
+    async function getList(): Promise<IProduct[]> {
+        const response = await axios.get('/api/products');
+        return response.data;
     }
 
-    if (error) return <NotFound message={error} />;
+    if (error) return <NotFound message={error.message} />;
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4">

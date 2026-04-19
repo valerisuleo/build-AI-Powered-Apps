@@ -13,4 +13,5 @@ export interface IProduct {
     description: string;
     price: number;
     reviews?: IReview[];
+    summary?: string;
 }

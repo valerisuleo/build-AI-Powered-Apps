@@ -4,7 +4,7 @@ import prisma from '../config/prisma';
 import { getReviews } from './reviews';
 import { Summary } from '../models/summary';
 
-async function getCachedSummary(productId: number) {
+export async function getCachedSummary(productId: number) {
     return prisma.summary.findFirst({
         where: {
             productId,
@@ -22,6 +22,20 @@ async function storeReviewSummary(productId: number, summary: string) {
         create: { productId, content: summary, expiresAt },
         update: { content: summary, generatedAt: now, expiresAt },
     });
+}
+
+async function showRoute(req: Request, res: Response, next: NextFunction) {
+    const productId = Number(req.params.id);
+    try {
+        if (isNaN(productId)) return res.badRequest('Invalid product ID');
+
+        const cached = await getCachedSummary(productId);
+        if (!cached) return res.notFound();
+
+        res.json({ summary: cached.content });
+    } catch (error) {
+        next(error);
+    }
 }
 
 async function createRoute(req: Request, res: Response, next: NextFunction) {
@@ -49,5 +63,6 @@ async function createRoute(req: Request, res: Response, next: NextFunction) {
 }
 
 export const summaryCtrl = {
+    show: showRoute,
     create: createRoute,
 };
