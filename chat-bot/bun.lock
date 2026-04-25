@@ -5,6 +5,7 @@
     "": {
       "name": "chat-bot",
       "dependencies": {
+        "ollama": "^0.6.3",
         "react-markdown": "^10.1.0",
       },
       "devDependencies": {
@@ -56,6 +57,7 @@
     "packages/server": {
       "name": "server",
       "dependencies": {
+        "@huggingface/inference": "^4.13.15",
         "@prisma/adapter-mariadb": "^7.7.0",
         "@prisma/client": "^7.7.0",
         "dayjs": "^1.11.20",
@@ -177,6 +179,12 @@
     "@fontsource-variable/geist": ["@fontsource-variable/geist@5.2.8", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/@fontsource-variable/geist/-/geist-5.2.8.tgz", {}, "sha512-cJ6m9e+8MQ5dCYJsLylfZrgBh6KkG4bOLckB35Tr9J/EqdkEM6QllH5PxqP1dhTvFup+HtMRPuz9xOjxXJggxw=="],
 
     "@hono/node-server": ["@hono/node-server@1.19.11", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/@hono/node-server/-/node-server-1.19.11.tgz", { "peerDependencies": { "hono": "^4" } }, "sha512-dr8/3zEaB+p0D2n/IUrlPF1HZm586qgJNXK1a9fhg/PzdtkK7Ksd5l312tJX2yBuALqDYBlG20QEbayqPyxn+g=="],
+
+    "@huggingface/inference": ["@huggingface/inference@4.13.15", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/@huggingface/inference/-/inference-4.13.15.tgz", { "dependencies": { "@huggingface/jinja": "^0.5.5", "@huggingface/tasks": "^0.19.90" } }, "sha512-V7B13KFDVhYkQqgx8vpMcmtEG+PoePlh65IUvpphTTItHAq6zRLcsS4torh1QavUaT+6nEwho4wFXzBQNGBwKQ=="],
+
+    "@huggingface/jinja": ["@huggingface/jinja@0.5.8", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/@huggingface/jinja/-/jinja-0.5.8.tgz", {}, "sha512-ZdElB7DPS7QQS8ZnFc5RPPtkg+eN11z8AmIZWAyes6pSbwXqiFB/POVevvm01begdSX1ho9Gxln/F6qlQMsuaA=="],
+
+    "@huggingface/tasks": ["@huggingface/tasks@0.19.90", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/@huggingface/tasks/-/tasks-0.19.90.tgz", {}, "sha512-nfV9luJbvwGQ/5oKXkKhCV9h4X7mwh1YaGG3ORd6UMLDSwr1OFSSatcBX0O9OtBtmNK19aGSjbLFqqgcIR6+IA=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/@humanfs/core/-/core-0.19.1.tgz", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 
@@ -1154,6 +1162,8 @@
 
     "ohash": ["ohash@2.0.11", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/ohash/-/ohash-2.0.11.tgz", {}, "sha512-RdR9FQrFwNBNXAr4GixM8YaRZRJ5PUWbKYbE5eOsrwAjJW0q2REGcf79oYPsLyskQCZG1PLN+S/K1V00joZAoQ=="],
 
+    "ollama": ["ollama@0.6.3", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/ollama/-/ollama-0.6.3.tgz", { "dependencies": { "whatwg-fetch": "^3.6.20" } }, "sha512-KEWEhIqE5wtfzEIZbDCLH51VFZ6Z3ZSa6sIOg/E/tBV8S51flyqBOXi+bRxlOYKDf8i327zG9eSTb8IJxvm3Zg=="],
+
     "on-finished": ["on-finished@2.4.1", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/on-finished/-/on-finished-2.4.1.tgz", { "dependencies": { "ee-first": "1.1.1" } }, "sha512-oVlzkg3ENAhCk2zdv7IJwd/QUD4z2RxRwpkcGY8psCVcCYZNq4wYnVWALHM+brtuJjePWiYF/ClmuDr8Ch5+kg=="],
 
     "once": ["once@1.4.0", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/once/-/once-1.4.0.tgz", { "dependencies": { "wrappy": "1" } }, "sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w=="],
@@ -1468,6 +1478,8 @@
 
     "web-streams-polyfill": ["web-streams-polyfill@3.3.3", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/web-streams-polyfill/-/web-streams-polyfill-3.3.3.tgz", {}, "sha512-d2JWLCivmZYTSIoge9MsgFCZrt571BikcWGYkjC1khllbTeDlGqZ2D8vD8E/lJa8WGWbb7Plm8/XJYV7IJHZZw=="],
 
+    "whatwg-fetch": ["whatwg-fetch@3.6.20", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/whatwg-fetch/-/whatwg-fetch-3.6.20.tgz", {}, "sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg=="],
+
     "which": ["which@2.0.2", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/which/-/which-2.0.2.tgz", { "dependencies": { "isexe": "^2.0.0" }, "bin": { "node-which": "./bin/node-which" } }, "sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA=="],
 
     "word-wrap": ["word-wrap@1.2.5", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/word-wrap/-/word-wrap-1.2.5.tgz", {}, "sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA=="],
@@ -1594,7 +1606,7 @@
 
     "router/path-to-regexp": ["path-to-regexp@8.3.0", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/path-to-regexp/-/path-to-regexp-8.3.0.tgz", {}, "sha512-7jdwVIRtsP8MYpdXSwOS0YdD0Du+qOoF/AEPIt88PcCFrZCzx41oxku1jD88hZBwbNUIEfpqvuhjFaMAqMTWnA=="],
 
-    "server/@types/bun": ["@types/bun@1.3.12", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/@types/bun/-/bun-1.3.12.tgz", { "dependencies": { "bun-types": "1.3.12" } }, "sha512-DBv81elK+/VSwXHDlnH3Qduw+KxkTIWi7TXkAeh24zpi5l0B2kUg9Ga3tb4nJaPcOFswflgi/yAvMVBPrxMB+A=="],
+    "server/@types/bun": ["@types/bun@1.3.13", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/@types/bun/-/bun-1.3.13.tgz", { "dependencies": { "bun-types": "1.3.13" } }, "sha512-9fqXWk5YIHGGnUau9TEi+qdlTYDAnOj+xLCmSTwXfAIqXr2x4tytJb43E9uCvt09zJURKXwAtkoH4nLQfzeTXw=="],
 
     "shadcn/zod": ["zod@3.25.76", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/zod/-/zod-3.25.76.tgz", {}, "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="],
 
@@ -1636,7 +1648,7 @@
 
     "mariadb/@types/node/undici-types": ["undici-types@7.16.0", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/undici-types/-/undici-types-7.16.0.tgz", {}, "sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw=="],
 
-    "server/@types/bun/bun-types": ["bun-types@1.3.12", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/bun-types/-/bun-types-1.3.12.tgz", { "dependencies": { "@types/node": "*" } }, "sha512-HqOLj5PoFajAQciOMRiIZGNoKxDJSr6qigAttOX40vJuSp6DN/CxWp9s3C1Xwm4oH7ybueITwiaOcWXoYVoRkA=="],
+    "server/@types/bun/bun-types": ["bun-types@1.3.13", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/bun-types/-/bun-types-1.3.13.tgz", { "dependencies": { "@types/node": "*" } }, "sha512-QXKeHLlOLqQX9LgYaHJfzdBaV21T63HhFJnvuRCcjZiaUDpbs5ED1MgxbMra71CsryN/1dAoXuJJJwIv/2drVA=="],
 
     "wrap-ansi/string-width/emoji-regex": ["emoji-regex@8.0.0", "https://sailpoint.jfrog.io/artifactory/api/npm/sp-npm-dev/emoji-regex/-/emoji-regex-8.0.0.tgz", {}, "sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A=="],
 
